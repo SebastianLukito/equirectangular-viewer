@@ -6,6 +6,17 @@ let targetRotationX = 0, targetRotationY = 0;
 let rotationX = 0, rotationY = 0;
 let fov = 75;
 
+// Movement variables
+let cameraPosition = { x: 0, y: 0, z: 0 };
+let targetPosition = { x: 0, y: 0, z: 0 };
+let movementSpeed = 2;
+let keys = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false
+};
+
 // Initialize the panorama viewer
 function init() {
     const container = document.getElementById('panorama');
@@ -46,6 +57,7 @@ function init() {
     
     // Event listeners
     setupEventListeners();
+    setupMovementControls();
 }
 
 function createPanorama() {
@@ -83,8 +95,88 @@ function setupEventListeners() {
     // Window resize
     window.addEventListener('resize', onWindowResize);
     
+    // Keyboard events
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    
     // Prevent context menu
     container.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
+function setupMovementControls() {
+    const buttons = {
+        forward: document.getElementById('btn-forward'),
+        backward: document.getElementById('btn-backward'),
+        left: document.getElementById('btn-left'),
+        right: document.getElementById('btn-right')
+    };
+    
+    Object.keys(buttons).forEach(direction => {
+        const btn = buttons[direction];
+        
+        // Mouse events
+        btn.addEventListener('mousedown', () => startMovement(direction));
+        btn.addEventListener('mouseup', () => stopMovement(direction));
+        btn.addEventListener('mouseleave', () => stopMovement(direction));
+        
+        // Touch events
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startMovement(direction);
+        });
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopMovement(direction);
+        });
+        btn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            stopMovement(direction);
+        });
+    });
+}
+
+function startMovement(direction) {
+    keys[direction] = true;
+    document.getElementById(`btn-${direction}`).classList.add('pressed');
+}
+
+function stopMovement(direction) {
+    keys[direction] = false;
+    document.getElementById(`btn-${direction}`).classList.remove('pressed');
+}
+
+function onKeyDown(event) {
+    switch(event.code) {
+        case 'KeyW':
+            startMovement('forward');
+            break;
+        case 'KeyS':
+            startMovement('backward');
+            break;
+        case 'KeyA':
+            startMovement('left');
+            break;
+        case 'KeyD':
+            startMovement('right');
+            break;
+    }
+}
+
+function onKeyUp(event) {
+    switch(event.code) {
+        case 'KeyW':
+            stopMovement('forward');
+            break;
+        case 'KeyS':
+            stopMovement('backward');
+            break;
+        case 'KeyA':
+            stopMovement('left');
+            break;
+        case 'KeyD':
+            stopMovement('right');
+            break;
+    }
 }
 
 function onMouseDown(event) {
@@ -202,6 +294,9 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
     
+    // Handle movement
+    updateMovement();
+    
     // Smooth camera movement
     rotationX += (targetRotationX - rotationX) * 0.1;
     rotationY += (targetRotationY - rotationY) * 0.1;
@@ -210,12 +305,65 @@ function animate() {
     camera.rotation.x = rotationX;
     camera.rotation.y = rotationY;
     
+    // Apply position to camera
+    camera.position.x += (targetPosition.x - camera.position.x) * 0.1;
+    camera.position.y += (targetPosition.y - camera.position.y) * 0.1;
+    camera.position.z += (targetPosition.z - camera.position.z) * 0.1;
+    
     // Auto-rotate when not interacting
     if (!isMouseDown) {
         targetRotationY += 0.001; // Slow auto-rotation
     }
     
     render();
+}
+
+function updateMovement() {
+    const moveSpeed = movementSpeed;
+    
+    // Calculate movement direction based on camera rotation
+    const forward = new THREE.Vector3();
+    const right = new THREE.Vector3();
+    
+    // Get forward direction (camera's negative z-axis in world space)
+    forward.set(
+        -Math.sin(rotationY),
+        0,
+        -Math.cos(rotationY)
+    );
+    
+    // Get right direction (cross product of forward and up)
+    right.set(
+        Math.cos(rotationY),
+        0,
+        -Math.sin(rotationY)
+    );
+    
+    // Apply movement based on pressed keys
+    if (keys.forward) {
+        targetPosition.x += forward.x * moveSpeed;
+        targetPosition.z += forward.z * moveSpeed;
+    }
+    if (keys.backward) {
+        targetPosition.x -= forward.x * moveSpeed;
+        targetPosition.z -= forward.z * moveSpeed;
+    }
+    if (keys.left) {
+        targetPosition.x -= right.x * moveSpeed;
+        targetPosition.z -= right.z * moveSpeed;
+    }
+    if (keys.right) {
+        targetPosition.x += right.x * moveSpeed;
+        targetPosition.z += right.z * moveSpeed;
+    }
+    
+    // Limit movement range (optional)
+    const maxDistance = 200;
+    const distance = Math.sqrt(targetPosition.x * targetPosition.x + targetPosition.z * targetPosition.z);
+    if (distance > maxDistance) {
+        targetPosition.x = (targetPosition.x / distance) * maxDistance;
+        targetPosition.z = (targetPosition.z / distance) * maxDistance;
+    }
 }
 
 function render() {
