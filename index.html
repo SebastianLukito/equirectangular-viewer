@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° Interior Panorama</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <div id="panorama">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <div id="loading">
+            <div class="loader"></div>
+            <p>Loading panorama...</p>
+        </div>
+        
+        <div id="controls">
+            <div class="control-info">
+                <p>🖱️ Drag to look around</p>
+                <p>🔍 Scroll to zoom</p>
+            </div>
+        </div>
+        
+        <div id="info">
+            <h1>360° Interior View</h1>
+            <p>Explore this beautiful modern interior by dragging your mouse</p>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: #000;
+    color: white;
+}
+
+#container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#panorama {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+#panorama:active {
+    cursor: grabbing;
+}
+
+#canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 100;
+    transition: opacity 0.5s ease;
+}
+
+#loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#controls {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-info p {
+    font-size: 14px;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.control-info p:last-child {
+    margin-bottom: 0;
+}
+
+#info {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px 25px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 350px;
+}
+
+#info h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#info p {
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #info {
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+        padding: 15px 20px;
+    }
+    
+    #info h1 {
+        font-size: 20px;
+    }
+    
+    #controls {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 15px;
+    }
+    
+    .control-info p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #info {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        margin: 20px;
+        background: rgba(0, 0, 0, 0.9);
+    }
+    
+    #controls {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin: 0 20px 20px 20px;
+        background: rgba(0, 0, 0, 0.9);
+    }
+}
+
+/* Smooth animations */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    display: none;
+}
